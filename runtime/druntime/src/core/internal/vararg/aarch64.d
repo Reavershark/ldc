@@ -21,7 +21,7 @@ else version (TVOS) {}
 else version (WatchOS) {}
 else:
 
-import core.stdc.stdarg : alignUp;
+import core.internal.util.alignment : alignUp;
 
 //@nogc:    // Not yet, need to make TypeInfo's member functions @nogc first
 nothrow:

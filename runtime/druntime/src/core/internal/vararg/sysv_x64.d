@@ -20,7 +20,7 @@ version (X86_64)
 
 version (SysV_x64):
 
-import core.stdc.stdarg : alignUp;
+import core.internal.util.alignment : alignUp;
 
 //@nogc:    // Not yet, need to make TypeInfo's member functions @nogc first
 nothrow:
