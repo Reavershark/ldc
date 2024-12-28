@@ -9,12 +9,11 @@
 */
 module core.internal.array.construction;
 
+debug (core_internal_array_construction_trace) debug = trace;
+
 import core.internal.traits : Unqual;
 
-debug(PRINTF)
-{
-    import core.stdc.stdio;
-}
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 /**
  * Does array initialization (not assignment) from another array of the same element type.
@@ -46,9 +45,8 @@ Tarr _d_arrayctor(Tarr : T[], T)(return scope Tarr to, scope Tarr from, char* ma
     import core.lifetime : copyEmplace;
     import core.stdc.string : memcpy;
     import core.stdc.stdint : uintptr_t;
-    debug(PRINTF) import core.stdc.stdio : printf;
 
-    debug(PRINTF) printf("_d_arrayctor(from = %p,%d) size = %d\n", from.ptr, from.length, T.sizeof);
+    debug (trace) logTrace!"_d_arrayctor(from = %p,%d) size = %d"(from.ptr, from.length, T.sizeof);
 
     void[] vFrom = (cast(void*) from.ptr)[0..from.length];
     void[] vTo = (cast(void*) to.ptr)[0..to.length];
@@ -356,7 +354,7 @@ T[] _d_newarrayU(T)(size_t length, bool isShared=false) @trusted
     size_t elemSize = T.sizeof;
     size_t arraySize;
 
-    debug(PRINTF) printf("_d_newarrayU(length = x%zu, size = %zu)\n", length, elemSize);
+    debug (trace) logTrace!"_d_newarrayU(length = x%zu, size = %zu)"(length, elemSize);
     if (length == 0 || elemSize == 0)
         return null;
 
@@ -398,7 +396,7 @@ Lcontinue:
     auto info = __arrayAlloc!UnqT(arraySize);
     if (!info.base)
         goto Loverflow;
-    debug(PRINTF) printf("p = %p\n", info.base);
+    debug (trace) logTrace!"p = %p"(info.base);
 
     auto arrstart = __arrayStart(info);
 
@@ -513,7 +511,7 @@ version (D_ProfileGC)
  */
 Tarr _d_newarraymTX(Tarr : U[], T, U)(size_t[] dims, bool isShared=false) @trusted
 {
-    debug(PRINTF) printf("_d_newarraymTX(dims.length = %d)\n", dims.length);
+    debug (trace) logTrace!"_d_newarraymTX(dims.length = %d)"(dims.length);
 
     if (dims.length == 0)
         return null;
@@ -526,7 +524,8 @@ Tarr _d_newarraymTX(Tarr : U[], T, U)(size_t[] dims, bool isShared=false) @trust
 
         auto dim = dims[0];
 
-        debug(PRINTF) printf("__allocateInnerArray(UnqT = %s, dim = %lu, ndims = %lu\n", UnqT.stringof.ptr, dim, dims.length);
+        debug (trace) logTrace!"__allocateInnerArray(UnqT = %s, dim = %lu, ndims = %lu"(
+            UnqT.stringof.ptr, dim, dims.length);
         if (dims.length == 1)
         {
             auto r = _d_newarrayT!UnqT(dim, isShared);
@@ -547,7 +546,7 @@ Tarr _d_newarraymTX(Tarr : U[], T, U)(size_t[] dims, bool isShared=false) @trust
     }
 
     auto result = __allocateInnerArray(dims);
-    debug(PRINTF) printf("result = %llx\n", result.ptr);
+    debug (trace) logTrace!"result = %llx"(result.ptr);
 
     return (cast(U*) result.ptr)[0 .. dims[0]];
 }

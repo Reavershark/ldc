@@ -630,8 +630,8 @@ extern (C) UnitTestResult runModuleUnitTests()
                 if (moduleName.length && e.file.length > moduleName.length
                     && e.file[0 .. moduleName.length] == moduleName)
                 {
-                    import core.stdc.stdio;
-                    printf("%.*s(%llu): [unittest] %.*s\n",
+                    alias log = imported!"core.internal.util.log".log!"unittestAssertError";
+                    log!"%.*s(%llu): [unittest] %.*s"(
                         cast(int) e.file.length, e.file.ptr, cast(ulong) e.line,
                         cast(int) e.message.length, e.message.ptr);
 
@@ -779,15 +779,14 @@ Throwable.TraceInfo defaultTraceHandler( void* ptr = null ) // @nogc
 unittest
 {
     import core.runtime;
-    import core.stdc.stdio;
+
+    alias log = imported!"core.internal.util.log".log!"unittest";
 
     void main()
     {
         auto trace = defaultTraceHandler(null);
         foreach (line; trace)
-        {
-            printf("%.*s\n", cast(int)line.length, line.ptr);
-        }
+            log!"%.*s"(cast(int)line.length, line.ptr);
         defaultTraceDeallocator(trace);
     }
 }

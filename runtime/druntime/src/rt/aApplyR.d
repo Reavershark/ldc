@@ -8,7 +8,11 @@
  */
 module rt.aApplyR;
 
+debug (rt_aApplyR_trace) debug = trace;
+
 import core.internal.utf;
+
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 /**********************************************/
 /* 1 argument versions */
@@ -37,7 +41,7 @@ Returns:
 extern (C) int _aApplyRcd1(scope const(char)[] aa, dg_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRcd1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRcd1(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d;
 
@@ -68,7 +72,7 @@ extern (C) int _aApplyRcd1(scope const(char)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRcd1.unittest\n");
+    debug (trace) logTrace!"_aApplyRcd1.unittest";
 
     auto s = "hello"c[];
     int i;
@@ -92,7 +96,7 @@ unittest
     i = 0;
     foreach_reverse (dchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'b'); break;
@@ -110,7 +114,7 @@ unittest
 extern (C) int _aApplyRwd1(scope const(wchar)[] aa, dg_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRwd1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRwd1(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d;
 
@@ -131,7 +135,7 @@ extern (C) int _aApplyRwd1(scope const(wchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRwd1.unittest\n");
+    debug (trace) logTrace!"_aApplyRwd1.unittest";
 
     auto s = "hello"w[];
     int i;
@@ -155,7 +159,7 @@ unittest
     i = 0;
     foreach_reverse (dchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'b'); break;
@@ -173,7 +177,7 @@ unittest
 extern (C) int _aApplyRcw1(scope const(char)[] aa, dg_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRcw1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRcw1(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d;
         wchar w;
@@ -216,7 +220,7 @@ extern (C) int _aApplyRcw1(scope const(char)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRcw1.unittest\n");
+    debug (trace) logTrace!"_aApplyRcw1.unittest";
 
     auto s = "hello"c[];
     int i;
@@ -240,7 +244,7 @@ unittest
     i = 0;
     foreach_reverse (wchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'b'); break;
@@ -259,7 +263,7 @@ unittest
 extern (C) int _aApplyRwc1(scope const(wchar)[] aa, dg_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRwc1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRwc1(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d;
         char c;
@@ -296,7 +300,7 @@ extern (C) int _aApplyRwc1(scope const(wchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRwc1.unittest\n");
+    debug (trace) logTrace!"_aApplyRwc1.unittest";
 
     auto s = "hello"w[];
     int i;
@@ -320,7 +324,7 @@ unittest
     i = 0;
     foreach_reverse (char d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'b'); break;
@@ -343,7 +347,7 @@ unittest
 extern (C) int _aApplyRdc1(scope const(dchar)[] aa, dg_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRdc1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRdc1(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0;)
     {   dchar d = aa[--i];
         char c;
@@ -374,7 +378,7 @@ extern (C) int _aApplyRdc1(scope const(dchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRdc1.unittest\n");
+    debug (trace) logTrace!"_aApplyRdc1.unittest";
 
     auto s = "hello"d[];
     int i;
@@ -398,7 +402,7 @@ unittest
     i = 0;
     foreach_reverse (char d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'b'); break;
@@ -421,7 +425,7 @@ unittest
 extern (C) int _aApplyRdw1(scope const(dchar)[] aa, dg_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRdw1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRdw1(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d = aa[--i];
         wchar w;
@@ -445,7 +449,7 @@ extern (C) int _aApplyRdw1(scope const(dchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRdw1.unittest\n");
+    debug (trace) logTrace!"_aApplyRdw1.unittest";
 
     auto s = "hello"d[];
     int i;
@@ -469,7 +473,7 @@ unittest
     i = 0;
     foreach_reverse (wchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'b'); break;
@@ -507,7 +511,7 @@ extern (C) int _aApplyRcd2(scope const(char)[] aa, dg2_t dg)
     size_t i;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplyRcd2(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplyRcd2(), len = %d"(len);
     for (i = len; i != 0; )
     {   dchar d;
 
@@ -538,7 +542,7 @@ extern (C) int _aApplyRcd2(scope const(char)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRcd2.unittest\n");
+    debug (trace) logTrace!"_aApplyRcd2.unittest";
 
     auto s = "hello"c[];
     int i;
@@ -563,7 +567,7 @@ unittest
     i = 0;
     foreach_reverse (k, dchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(d == 'b'); assert(k == 8); break;
@@ -581,7 +585,7 @@ unittest
 extern (C) int _aApplyRwd2(scope const(wchar)[] aa, dg2_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRwd2(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRwd2(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d;
 
@@ -602,14 +606,14 @@ extern (C) int _aApplyRwd2(scope const(wchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRwd2.unittest\n");
+    debug (trace) logTrace!"_aApplyRwd2.unittest";
 
     auto s = "hello"w[];
     int i;
 
     foreach_reverse (k, dchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == 4 - i);
         switch (i)
         {
@@ -628,7 +632,7 @@ unittest
     i = 0;
     foreach_reverse (k, dchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 4); assert(d == 'b'); break;
@@ -646,7 +650,7 @@ unittest
 extern (C) int _aApplyRcw2(scope const(char)[] aa, dg2_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRcw2(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRcw2(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d;
         wchar w;
@@ -689,14 +693,14 @@ extern (C) int _aApplyRcw2(scope const(char)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRcw2.unittest\n");
+    debug (trace) logTrace!"_aApplyRcw2.unittest";
 
     auto s = "hello"c[];
     int i;
 
     foreach_reverse (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == 4 - i);
         switch (i)
         {
@@ -715,7 +719,7 @@ unittest
     i = 0;
     foreach_reverse (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 8); assert(d == 'b'); break;
@@ -734,7 +738,7 @@ unittest
 extern (C) int _aApplyRwc2(scope const(wchar)[] aa, dg2_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRwc2(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRwc2(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d;
         char c;
@@ -771,14 +775,14 @@ extern (C) int _aApplyRwc2(scope const(wchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRwc2.unittest\n");
+    debug (trace) logTrace!"_aApplyRwc2.unittest";
 
     auto s = "hello"w[];
     int i;
 
     foreach_reverse (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == 4 - i);
         switch (i)
         {
@@ -797,7 +801,7 @@ unittest
     i = 0;
     foreach_reverse (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 4); assert(d == 'b'); break;
@@ -820,7 +824,7 @@ unittest
 extern (C) int _aApplyRdc2(scope const(dchar)[] aa, dg2_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRdc2(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRdc2(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d = aa[--i];
         char c;
@@ -850,14 +854,14 @@ extern (C) int _aApplyRdc2(scope const(dchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRdc2.unittest\n");
+    debug (trace) logTrace!"_aApplyRdc2.unittest";
 
     auto s = "hello"d[];
     int i;
 
     foreach_reverse (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == 4 - i);
         switch (i)
         {
@@ -876,7 +880,7 @@ unittest
     i = 0;
     foreach_reverse (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 3); assert(d == 'b'); break;
@@ -899,7 +903,7 @@ unittest
 extern (C) int _aApplyRdw2(scope const(dchar)[] aa, dg2_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplyRdw2(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplyRdw2(), len = %d"(aa.length);
     for (size_t i = aa.length; i != 0; )
     {   dchar d = aa[--i];
         wchar w;
@@ -923,14 +927,14 @@ extern (C) int _aApplyRdw2(scope const(dchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRdw2.unittest\n");
+    debug (trace) logTrace!"_aApplyRdw2.unittest";
 
     auto s = "hello"d[];
     int i;
 
     foreach_reverse (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == 4 - i);
         switch (i)
         {
@@ -949,7 +953,7 @@ unittest
     i = 0;
     foreach_reverse (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 3); assert(d == 'b'); break;

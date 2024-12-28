@@ -67,8 +67,9 @@ module core.time;
 
 import core.exception;
 import core.stdc.time;
-import core.stdc.stdio;
 import core.internal.string;
+
+version (unittest) private alias logUnittest = imported!"core.internal.util.log".log!"unittest";
 
 version (Windows)
 {
@@ -2622,7 +2623,7 @@ unittest
             auto v2 = MonoTimeImpl!type.currTime;
             scope(failure)
             {
-                printf("%s: v1 %s, v2 %s, tps %s\n",
+                logUnittest!"%s: v1 %s, v2 %s, tps %s"(
                        (type.stringof ~ "\0").ptr,
                        numToStringz(v1._ticks),
                        numToStringz(v2._ticks),
@@ -2696,7 +2697,7 @@ unittest
     import core.stdc.stdlib;
     immutable seed = cast(int)time(null);
     srand(seed);
-    scope(failure) printf("seed %d\n", seed);
+    scope(failure) logUnittest!"seed %d"(seed);
     enum freq1 = 5_527_551L;
     enum freq2 = 10_000_000L;
     enum freq3 = 1_000_000_000L;
@@ -2718,14 +2719,14 @@ unittest
         long[2] values = [rand(), cast(long)rand() * (rand() % 16)];
         foreach (i; values)
         {
-            scope(failure) printf("i %s\n", numToStringz(i));
+            scope(failure) logUnittest!"i %s"(numToStringz(i));
             assertApprox(convClockFreq(convClockFreq(i, freq1, freq2), freq2, freq1), i - 10, i + 10);
             assertApprox(convClockFreq(convClockFreq(i, freq2, freq1), freq1, freq2), i - 10, i + 10);
 
             assertApprox(convClockFreq(convClockFreq(i, freq3, freq4), freq4, freq3), i - 100, i + 100);
             assertApprox(convClockFreq(convClockFreq(i, freq4, freq3), freq3, freq4), i - 100, i + 100);
 
-            scope(failure) printf("sys %s mt %s\n", numToStringz(freq5), numToStringz(freq6));
+            scope(failure) logUnittest!"sys %s mt %s"(numToStringz(freq5), numToStringz(freq6));
             assertApprox(convClockFreq(convClockFreq(i, freq5, freq6), freq6, freq5), i - 10, i + 10);
             assertApprox(convClockFreq(convClockFreq(i, freq6, freq5), freq5, freq6), i - 10, i + 10);
 

@@ -327,9 +327,8 @@ U[] _dup(T, U)(T[] a) if (!__traits(isPOD, T))
         {
             if (l != 0xDEADBEEF)
             {
-                import core.stdc.stdio;
-                printf("Unexpected value: %lld\n", l);
-                fflush(stdout);
+                alias log = imported!"core.internal.util.log".log!"unittest";
+                log!"Unexpected value: %lld"(l);
                 assert(false);
             }
         }

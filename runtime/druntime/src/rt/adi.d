@@ -11,12 +11,9 @@
 
 module rt.adi;
 
-//debug=adi;            // uncomment to turn on debugging printf's
+debug (rt_adi_trace) debug = trace;
 
-private
-{
-    debug(adi) import core.stdc.stdio;
-}
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 /***************************************
  * Support for array equality test.
@@ -27,7 +24,7 @@ private
 
 extern (C) int _adEq2(void[] a1, void[] a2, TypeInfo ti)
 {
-    debug(adi) printf("_adEq2(a1.length = %d, a2.length = %d)\n", a1.length, a2.length);
+    debug (trace) logTrace!"_adEq2(a1.length = %d, a2.length = %d)"(a1.length, a2.length);
     if (a1.length != a2.length)
         return 0;               // not equal
     if (!ti.equals(&a1, &a2))
@@ -37,7 +34,7 @@ extern (C) int _adEq2(void[] a1, void[] a2, TypeInfo ti)
 
 @safe unittest
 {
-    debug(adi) printf("array.Eq unittest\n");
+    debug (trace) logTrace!"array.Eq unittest";
 
     struct S(T) { T val; }
     alias String = S!string;
@@ -57,7 +54,7 @@ extern (C) int _adEq2(void[] a1, void[] a2, TypeInfo ti)
 
 unittest
 {
-    debug(adi) printf("struct.Eq unittest\n");
+    debug (trace) logTrace!"struct.Eq unittest";
 
     static struct TestStruct
     {

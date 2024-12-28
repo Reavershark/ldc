@@ -1991,7 +1991,7 @@ private extern (D) bool suspend( Thread t ) nothrow @nogc
                 onThreadError("Unable to load thread state");
             // TODO: ThreadException here recurses forever!  Does it
             //still using onThreadError?
-            //printf("state count %d (expect %d)\n", count ,ARM_THREAD_STATE64_COUNT);
+            //log!"state count %d (expect %d)"(count, ARM_THREAD_STATE64_COUNT);
             if (!t.m_lock)
                 t.m_curr.tstack = cast(void*) state.sp;
 
@@ -2012,7 +2012,7 @@ private extern (D) bool suspend( Thread t ) nothrow @nogc
                 onThreadError("Unable to load thread state");
             // TODO: in past, ThreadException here recurses forever!  Does it
             //still using onThreadError?
-            //printf("state count %d (expect %d)\n", count ,ARM_THREAD_STATE32_COUNT);
+            //log!"state count %d (expect %d)"(count, ARM_THREAD_STATE32_COUNT);
             if (!t.m_lock)
                 t.m_curr.tstack = cast(void*) state.sp;
 

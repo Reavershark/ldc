@@ -230,7 +230,7 @@ else // Bionic, BSDs
 
 unittest
 {
-    import core.stdc.stdio;
+    alias log = imported!"core.internal.util.log".log!"unittest";
 
     char[512] buffer = void;
     foreach (object; SharedObjects)
@@ -239,8 +239,8 @@ unittest
         assert(name.length);
         const path = object.getPath(buffer);
 
-        printf("DSO name: %s\n", name.ptr);
-        printf("    path: %s\n", path ? path.ptr : "");
-        printf("    base: %p\n", object.baseAddress);
+        log!"DSO name: %s"(name.ptr);
+        log!"    path: %s"(path ? path.ptr : "");
+        log!"    base: %p"(object.baseAddress);
     }
 }

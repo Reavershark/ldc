@@ -21,6 +21,10 @@
 
 module core.internal.utf;
 
+version (unittest) debug (core_internal_utf_logUnittest) debug = logUnittest;
+
+version (unittest) debug (logUnittest) private alias logUnittest = imported!"core.internal.util.log".log!"unittest";
+
 extern (C) void onUnicodeError( string msg, size_t idx, string file = __FILE__, size_t line = __LINE__ ) @safe pure;
 
 /*******************************
@@ -48,7 +52,7 @@ bool isValidDchar(dchar c)
 
 unittest
 {
-    debug(utf) printf("utf.isValidDchar.unittest\n");
+    debug (logUnittest) logUnittest!"utf.isValidDchar.unittest";
     assert(isValidDchar(cast(dchar)'a') == true);
     assert(isValidDchar(cast(dchar)0x1FFFFF) == false);
 }
@@ -297,7 +301,7 @@ unittest
 {   size_t i;
     dchar c;
 
-    debug(utf) printf("utf.decode.unittest\n");
+    debug (logUnittest) logUnittest!"utf.decode.unittest";
 
     static s1 = "abcd"c;
     i = 0;
@@ -482,7 +486,7 @@ void encode(ref char[] s, dchar c)
 
 unittest
 {
-    debug(utf) printf("utf.encode.unittest\n");
+    debug (logUnittest) logUnittest!"utf.encode.unittest";
 
     char[] s = "abcd".dup;
     encode(s, cast(dchar)'a');
@@ -883,7 +887,7 @@ dstring toUTF32(return scope dstring s)
 
 unittest
 {
-    debug(utf) printf("utf.toUTF.unittest\n");
+    debug (logUnittest) logUnittest!"utf.toUTF.unittest";
 
     auto c = "hello"c[];
     auto w = toUTF16(c);
@@ -921,8 +925,8 @@ unittest
 
     c = "he\U000BAAAAllo";
     w = toUTF16(c);
-    //foreach (wchar c; w) printf("c = x%x\n", c);
-    //foreach (wchar c; cast(wstring)"he\U000BAAAAllo") printf("c = x%x\n", c);
+    //debug (logUnittest) foreach (wchar c; w) logUnittest!"c = x%x"(c);
+    //debug (logUnittest) foreach (wchar c; cast(wstring)"he\U000BAAAAllo") logUnittest!"c = x%x"(c);
     assert(w == "he\U000BAAAAllo");
     d = toUTF32(c);
     assert(d == "he\U000BAAAAllo");

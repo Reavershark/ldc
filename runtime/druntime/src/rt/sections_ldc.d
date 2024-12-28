@@ -34,8 +34,9 @@ else version (OpenBSD) {}
 else version (Windows) {}
 else version (LDC):
 
+debug (rt_sections_ldc_trace) debug = trace;
+
 import rt.minfo;
-debug(PRINTF) import core.stdc.stdio : printf;
 
 version (Solaris)
 {
@@ -44,6 +45,8 @@ version (Solaris)
     import core.sys.solaris.link;
     import core.sys.solaris.sys.elf;
 }
+
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 alias SectionGroup DSO;
 struct SectionGroup
@@ -317,7 +320,7 @@ private
  */
 void initSections() nothrow @nogc
 {
-    debug(PRINTF) printf("initSections called\n");
+    debug (trace) logTrace!"initSections called";
     globalSectionGroup.moduleGroup = ModuleGroup(getModuleInfos());
 
     static void pushRange(void* start, void* end) nothrow @nogc
@@ -339,7 +342,7 @@ void initSections() nothrow @nogc
  */
 void finiSections() nothrow @nogc
 {
-    debug(PRINTF) printf("finiSections called\n");
+    debug (trace) logTrace!"finiSections called";
     import core.stdc.stdlib : free;
     free(cast(void*)globalSectionGroup.modules.ptr);
 }
@@ -349,11 +352,11 @@ void finiSections() nothrow @nogc
  */
 void[] initTLSRanges() nothrow @nogc
 {
-    debug(PRINTF) printf("initTLSRanges called\n");
+    debug (trace) logTrace!"initTLSRanges called";
     version (UseELF)
     {
         auto rng = getTLSRange(&globalSectionGroup);
-        debug(PRINTF) printf("Add range %p %d\n", rng ? rng.ptr : cast(void*)0, rng ? rng.length : 0);
+        debug (trace) logTrace!"Add range %p %d"(rng ? rng.ptr : cast(void*)0, rng ? rng.length : 0);
         return rng;
     }
     else static assert(0, "TLS range detection not implemented for this OS.");
@@ -362,12 +365,12 @@ void[] initTLSRanges() nothrow @nogc
 
 void finiTLSRanges(void[] rng) nothrow @nogc
 {
-    debug(PRINTF) printf("finiTLSRanges called\n");
+    debug (trace) logTrace!"finiTLSRanges called";
 }
 
 void scanTLSRanges(void[] rng, scope void delegate(void* pbeg, void* pend) nothrow dg) nothrow
 {
-    debug(PRINTF) printf("scanTLSRanges called (rng = %p %d)\n", rng ? rng.ptr : cast(void*)0, rng ? rng.length : 0);
+    debug (trace) logTrace!"scanTLSRanges called (rng = %p %d)"(rng ? rng.ptr : cast(void*)0, rng ? rng.length : 0);
     if (rng) dg(rng.ptr, rng.ptr + rng.length);
 }
 

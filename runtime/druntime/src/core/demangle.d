@@ -21,8 +21,11 @@ else version (TVOS)
 else version (WatchOS)
     version = Darwin;
 
-debug(trace) import core.stdc.stdio : printf;
-debug(info) import core.stdc.stdio : printf;
+debug (core_demangle_info)  debug = info;
+debug (core_demangle_trace) debug = trace;
+
+debug (info)  private alias logInfo  = imported!"core.internal.util.log".log!"info";
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 extern (C) alias CXX_DEMANGLER = char* function (const char* mangled_name,
                                                 char* output_buffer,
@@ -182,8 +185,8 @@ pure @safe:
 
     void silent( out bool err_status, void delegate(out bool err_status) pure @safe nothrow dg ) nothrow
     {
-        debug(trace) printf( "silent+\n" );
-        debug(trace) scope(success) printf( "silent-\n" );
+        debug (trace) logTrace!"silent+";
+        scope(success) debug (trace) logTrace!"silent-";
         auto n = dst.length;
         dg(err_status);
         if(!err_status)
@@ -332,8 +335,8 @@ pure @safe:
     */
     const(char)[] sliceNumber() return scope
     {
-        debug(trace) printf( "sliceNumber+\n" );
-        debug(trace) scope(success) printf( "sliceNumber-\n" );
+        debug (trace) logTrace!"sliceNumber+";
+        scope(success) debug (trace) logTrace!"sliceNumber-";
 
         auto beg = pos;
 
@@ -350,16 +353,16 @@ pure @safe:
 
     size_t decodeNumber(out bool errStatus) scope nothrow
     {
-        debug(trace) printf( "decodeNumber+\n" );
-        debug(trace) scope(success) printf( "decodeNumber-\n" );
+        debug (trace) logTrace!"decodeNumber+";
+        scope(success) debug (trace) logTrace!"decodeNumber-";
 
         return decodeNumber( errStatus, sliceNumber() );
     }
 
     size_t decodeNumber( out bool errStatus, scope const(char)[] num ) scope nothrow
     {
-        debug(trace) printf( "decodeNumber+\n" );
-        debug(trace) scope(success) printf( "decodeNumber-\n" );
+        debug (trace) logTrace!"decodeNumber+";
+        scope(success) debug (trace) logTrace!"decodeNumber-";
 
         size_t val = 0;
 
@@ -381,8 +384,8 @@ pure @safe:
 
     void parseReal(out bool errStatus) scope nothrow
     {
-        debug(trace) printf( "parseReal+\n" );
-        debug(trace) scope(success) printf( "parseReal-\n" );
+        debug (trace) logTrace!"parseReal+";
+        scope(success) debug (trace) logTrace!"parseReal-";
 
         char[64] tbuf = void;
         size_t   tlen = 0;
@@ -456,9 +459,9 @@ pure @safe:
         }
 
         tbuf[tlen] = 0;
-        debug(info) printf( "got (%s)\n", tbuf.ptr );
+        debug (info) logInfo!"got (%s)"(tbuf.ptr);
         pureReprintReal( tbuf[] );
-        debug(info) printf( "converted (%.*s)\n", cast(int) tlen, tbuf.ptr );
+        debug (info) logInfo!"converted (%.*s)"(cast(int) tlen, tbuf.ptr);
         put( tbuf[0 .. tlen] );
     }
 
@@ -485,8 +488,8 @@ pure @safe:
     */
     void parseLName(out string errMsg) scope nothrow
     {
-        debug(trace) printf( "parseLName+\n" );
-        debug(trace) scope(success) printf( "parseLName-\n" );
+        debug (trace) logTrace!"parseLName+";
+        scope(success) debug (trace) logTrace!"parseLName-";
 
         static if (__traits(hasMember, Hooks, "parseLName"))
         {
@@ -760,8 +763,8 @@ pure @safe:
                     return BufSlice(n, 0, n.length);
         }
 
-        debug(trace) printf( "parseType+\n" );
-        debug(trace) scope(success) printf( "parseType-\n" );
+        debug (trace) logTrace!"parseType+";
+        scope(success) debug (trace) logTrace!"parseType-";
         auto beg = dst.length;
         auto t = front;
 
@@ -1194,7 +1197,7 @@ pure @safe:
         // Arguments
         for ( size_t n = 0; true; n++ )
         {
-            debug(info) printf( "tok (%c)\n", front );
+            debug (info) logInfo!"tok (%c)"(front);
             switch ( front )
             {
             case 'X': // ArgClose (variadic T t...) style)
@@ -1323,8 +1326,8 @@ pure @safe:
     */
     BufSlice parseTypeFunction(out bool errStatus, IsDelegate isdg = IsDelegate.no) return scope nothrow
     {
-        debug(trace) printf( "parseTypeFunction+\n" );
-        debug(trace) scope(success) printf( "parseTypeFunction-\n" );
+        debug (trace) logTrace!"parseTypeFunction+";
+        scope(success) debug (trace) logTrace!"parseTypeFunction-";
         auto beg = dst.length;
 
         parseCallConvention(errStatus);
@@ -1420,15 +1423,15 @@ pure @safe:
 
     void parseValue(out bool errStatus, scope BufSlice name, char type = '\0' ) scope nothrow
     {
-        debug(trace) printf( "parseValue+\n" );
-        debug(trace) scope(success) printf( "parseValue-\n" );
+        debug (trace) logTrace!"parseValue+";
+        scope(success) debug (trace) logTrace!"parseValue-";
 
         void onError()
         {
             errStatus = true;
         }
 
-//        printf( "*** %c\n", front );
+        // debug (trace) logTrace!"*** %c"(front);
         switch ( front )
         {
         case 'n':
@@ -1581,8 +1584,8 @@ pure @safe:
 
     void parseIntegerValue( out bool errStatus, scope BufSlice name, char type = '\0' ) scope nothrow
     {
-        debug(trace) printf( "parseIntegerValue+\n" );
-        debug(trace) scope(success) printf( "parseIntegerValue-\n" );
+        debug (trace) logTrace!"parseIntegerValue+";
+        scope(success) debug (trace) logTrace!"parseIntegerValue-";
 
         switch ( type )
         {
@@ -1696,8 +1699,8 @@ pure @safe:
     */
     void parseTemplateArgs(out bool errStatus) scope nothrow
     {
-        debug(trace) printf( "parseTemplateArgs+\n" );
-        debug(trace) scope(success) printf( "parseTemplateArgs-\n" );
+        debug (trace) logTrace!"parseTemplateArgs+";
+        scope(success) debug (trace) logTrace!"parseTemplateArgs-";
 
     L_nextArg:
         for ( size_t n = 0; true; n++ )
@@ -1750,7 +1753,7 @@ pure @safe:
                     auto p = pos;
                     auto b = brp;
 
-                    debug(trace) printf( "may be mangled name arg\n" );
+                    debug (trace) logTrace!"may be mangled name arg";
 
                     if (parseMangledNameArg())
                         continue;
@@ -1759,7 +1762,7 @@ pure @safe:
                         dst.len = l;
                         pos = p;
                         brp = b;
-                        debug(trace) printf( "not a mangled name arg\n" );
+                        debug (trace) logTrace!"not a mangled name arg";
                     }
                 }
                 if ( isDigit( front ) && isDigit( peek( 1 ) ) )
@@ -1816,8 +1819,8 @@ pure @safe:
 
     bool mayBeMangledNameArg() nothrow
     {
-        debug(trace) printf( "mayBeMangledNameArg+\n" );
-        debug(trace) scope(success) printf( "mayBeMangledNameArg-\n" );
+        debug (trace) logTrace!"mayBeMangledNameArg+";
+        scope(success) debug (trace) logTrace!"mayBeMangledNameArg-";
 
         bool errStatus;
         auto p = pos;
@@ -1845,8 +1848,8 @@ pure @safe:
 
     bool parseMangledNameArg() nothrow
     {
-        debug(trace) printf( "parseMangledNameArg+\n" );
-        debug(trace) scope(success) printf( "parseMangledNameArg-\n" );
+        debug (trace) logTrace!"parseMangledNameArg+";
+        scope(success) debug (trace) logTrace!"parseMangledNameArg-";
 
         bool errStatus;
 
@@ -1870,8 +1873,8 @@ pure @safe:
     */
     void parseTemplateInstanceName(out bool errStatus, bool hasNumber) scope nothrow
     {
-        debug(trace) printf( "parseTemplateInstanceName+\n" );
-        debug(trace) scope(success) printf( "parseTemplateInstanceName-\n" );
+        debug (trace) logTrace!"parseTemplateInstanceName+";
+        scope(success) debug (trace) logTrace!"parseTemplateInstanceName-";
 
         auto sav = pos;
         auto saveBrp = brp;
@@ -1924,8 +1927,8 @@ pure @safe:
 
     bool mayBeTemplateInstanceName() scope nothrow
     {
-        debug(trace) printf( "mayBeTemplateInstanceName+\n" );
-        debug(trace) scope(success) printf( "mayBeTemplateInstanceName-\n" );
+        debug (trace) logTrace!"mayBeTemplateInstanceName+";
+        scope(success) debug (trace) logTrace!"mayBeTemplateInstanceName-";
 
         auto p = pos;
         scope(exit) pos = p;
@@ -1949,8 +1952,8 @@ pure @safe:
     */
     void parseSymbolName(out bool errStatus) scope nothrow
     {
-        debug(trace) printf( "parseSymbolName+\n" );
-        debug(trace) scope(success) printf( "parseSymbolName-\n" );
+        debug (trace) logTrace!"parseSymbolName+";
+        scope(success) debug (trace) logTrace!"parseSymbolName-";
 
         // LName -> Number
         // TemplateInstanceName -> Number "__T"
@@ -1966,13 +1969,13 @@ pure @safe:
             {
                 auto t = dst.length;
 
-                debug(trace) printf( "may be template instance name\n" );
+                debug (trace) logTrace!"may be template instance name";
                 parseTemplateInstanceName(errStatus, true);
                 if (!errStatus)
                     return;
                 else
                 {
-                    debug(trace) printf( "not a template instance name\n" );
+                    debug (trace) logTrace!"not a template instance name";
                     dst.len = t;
                 }
             }
@@ -2052,8 +2055,8 @@ pure @safe:
     */
     void parseQualifiedName(out bool errStatus) return scope nothrow
     {
-        debug(trace) printf( "parseQualifiedName+\n" );
-        debug(trace) scope(success) printf( "parseQualifiedName-\n" );
+        debug (trace) logTrace!"parseQualifiedName+";
+        scope(success) debug (trace) logTrace!"parseQualifiedName-";
 
         size_t  n   = 0;
         bool is_sym_name_front;
@@ -2084,8 +2087,8 @@ pure @safe:
     */
     void parseMangledName( out bool errStatus, bool displayType, size_t n = 0 ) scope nothrow
     {
-        debug(trace) printf( "parseMangledName+\n" );
-        debug(trace) scope(success) printf( "parseMangledName-\n" );
+        debug (trace) logTrace!"parseMangledName+";
+        scope(success) debug (trace) logTrace!"parseMangledName-";
         BufSlice name = dst.bslice_empty;
 
         auto end = pos + n;
@@ -2128,7 +2131,7 @@ pure @safe:
             }
             name = dst[beg .. nameEnd];
 
-            debug(info) printf( "name (%.*s)\n", cast(int) name.length, name.ptr );
+            debug (info) logInfo!"name (%.*s)"(cast(int) name.length, &name.getSlice[0]);
             if ( 'M' == front )
                 popFront(); // has 'this' pointer
 
@@ -2176,7 +2179,7 @@ pure @safe:
     {
         while ( true )
         {
-            debug(info) printf( "demangle(%.*s)\n", cast(int) buf.length, buf.ptr );
+            debug (info) logInfo!"demangle(%.*s)"(cast(int) buf.length, &buf[0]);
 
             bool errStatus;
             FUNC(errStatus);
@@ -2186,7 +2189,7 @@ pure @safe:
             }
             else
             {
-                debug(info) printf( "error" );
+                debug (info) logInfo!"error";
 
                 return dst.copyInput(buf);
             }
@@ -3163,7 +3166,7 @@ private struct Buffer
             if ( !dst.length )
                 dst.length = minSize;
 
-            debug(info) printf( "appending (%.*s)\n", cast(int) val.length, val.ptr );
+            debug (info) logInfo!"appending (%.*s)"(cast(int) val.length, &val[0]);
 
             checkAndStretchBuf(val.length);
 

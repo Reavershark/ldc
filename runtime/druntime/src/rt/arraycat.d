@@ -10,12 +10,12 @@
 
 module rt.arraycat;
 
-private
-{
-    import core.stdc.string;
-    import core.internal.util.array;
-    debug(PRINTF) import core.stdc.stdio;
-}
+debug (rt_arraycat_trace) debug = trace;
+
+import core.stdc.string;
+import core.internal.util.array;
+
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 extern (C) @trusted nothrow:
 
@@ -33,8 +33,8 @@ else
 {
     void[] _d_arraycopy(size_t size, void[] from, void[] to)
     {
-        debug(PRINTF) printf("f = %p,%d, t = %p,%d, size = %d\n",
-                     from.ptr, from.length, to.ptr, to.length, size);
+        debug (trace) logTrace!"f = %p,%d, t = %p,%d, size = %d"(
+            from.ptr, from.length, to.ptr, to.length, size);
 
         enforceRawArraysConformable("copy", size, from, to);
         memcpy(to.ptr, from.ptr, to.length * size);

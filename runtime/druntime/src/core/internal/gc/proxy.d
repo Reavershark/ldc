@@ -16,6 +16,8 @@ static import core.memory;
 
 private
 {
+    alias log = imported!"core.internal.util.log".log!();
+
     static import core.memory;
     alias BlkInfo = core.memory.GC.BlkInfo;
 
@@ -60,11 +62,10 @@ extern (C)
             auto newInstance = createGCInstance(config.gc);
             if (newInstance is null)
             {
-                import core.stdc.stdio : fprintf, stderr;
                 import core.stdc.stdlib : exit;
-                import core.atomic : atomicLoad;
 
-                fprintf(atomicLoad(stderr), "No GC was initialized, please recheck the name of the selected GC ('%.*s').\n", cast(int)config.gc.length, config.gc.ptr);
+                log!"No GC was initialized, please recheck the name of the selected GC ('%.*s')."(
+                    cast(int)config.gc.length, config.gc.ptr);
                 instanceLock.unlock();
                 exit(1);
 
@@ -97,11 +98,8 @@ extern (C)
             switch (config.cleanup)
             {
                 default:
-                    import core.stdc.stdio : fprintf, stderr;
-                    import core.atomic : atomicLoad;
-
-                    fprintf(atomicLoad(stderr), "Unknown GC cleanup method, please recheck ('%.*s').\n",
-                            cast(int)config.cleanup.length, config.cleanup.ptr);
+                    log!"Unknown GC cleanup method, please recheck ('%.*s')."(
+                        cast(int)config.cleanup.length, config.cleanup.ptr);
                     break;
                 case "none":
                     break;

@@ -480,7 +480,7 @@ version (LinuxOrBSD)
 unittest
 {
     import core.internal.elf.dl : SharedObject;
-    import core.stdc.stdio : printf;
+    alias log = imported!"core.internal.util.log".log!"unittest";
 
     char* exePath = thisExePath();
     assert(exePath);
@@ -494,15 +494,15 @@ unittest
 
     foreach (index, name, sectionHeader; file.namedSections)
     {
-        printf("section %3d %-32s", cast(int) index, name.ptr);
+        log!"section %3d %-32s"(cast(int) index, name.ptr);
         if (const offset = sectionHeader.shdr.sh_addr)
         {
             auto beg = exeBaseAddress + offset;
-            printf("%p - %p\n", beg, beg + sectionHeader.shdr.sh_size);
+            log!"%p - %p"(beg, beg + sectionHeader.shdr.sh_size);
         }
         else
         {
-            printf("not mapped into memory\n");
+            log!"not mapped into memory";
         }
     }
 }

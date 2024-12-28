@@ -45,11 +45,12 @@ else version (TVOS)
 else version (WatchOS)
     version = Darwin;
 
+debug (deh_win64_posix_trace) debug = trace;
+
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
+
 version (LDC) {} else
 {
-
-//debug=PRINTF;
-debug(PRINTF) import core.stdc.stdio : printf;
 
 extern (C)
 {
@@ -158,9 +159,9 @@ immutable(FuncTable)* __eh_finddata(void *address)
 
 immutable(FuncTable)* __eh_finddata(void *address, immutable(FuncTable)* pstart, immutable(FuncTable)* pend)
 {
-    debug(PRINTF) printf("FuncTable.sizeof = %p\n", FuncTable.sizeof);
-    debug(PRINTF) printf("__eh_finddata(address = %p)\n", address);
-    debug(PRINTF) printf("_deh_beg = %p, _deh_end = %p\n", pstart, pend);
+    debug (trace) logTrace!"FuncTable.sizeof = %p"(FuncTable.sizeof);
+    debug (trace) logTrace!"__eh_finddata(address = %p)"(address);
+    debug (trace) logTrace!"_deh_beg = %p, _deh_end = %p"(pstart, pend);
 
     for (auto ft = pstart; 1; ft++)
     {
@@ -181,7 +182,7 @@ immutable(FuncTable)* __eh_finddata(void *address, immutable(FuncTable)* pstart,
             }
         }
 
-        debug(PRINTF) printf("  ft = %p, fptr = %p, handlertable = %p, fsize = x%03x\n",
+        debug (trace) logTrace!"  ft = %p, fptr = %p, handlertable = %p, fsize = x%03x"(
               ft, ft.fptr, ft.handlertable, ft.fsize);
 
         immutable(void)* fptr = ft.fptr;
@@ -200,11 +201,11 @@ immutable(FuncTable)* __eh_finddata(void *address, immutable(FuncTable)* pstart,
         if (fptr <= address &&
             address < cast(void *)(cast(char *)fptr + ft.fsize))
         {
-            debug(PRINTF) printf("\tfound handler table\n");
+            debug (trace) logTrace!"\tfound handler table";
             return ft;
         }
     }
-    debug(PRINTF) printf("\tnot found\n");
+    debug (trace) logTrace!"\tnot found";
     return null;
 }
 
@@ -246,10 +247,10 @@ extern (C) void _d_throwc(Throwable h)
 {
     size_t regebp;
 
-    debug(PRINTF)
+    debug (trace)
     {
-        printf("_d_throw(h = %p, &h = %p)\n", h, &h);
-        printf("\tvptr = %p\n", *cast(void **)h);
+        logTrace!"_d_throw(h = %p, &h = %p)"(h, &h);
+        logTrace!"\tvptr = %p"(*cast(void **)h);
     }
 
     version (D_InlineAsm_X86)
@@ -284,17 +285,17 @@ extern (C) void _d_throwc(Throwable h)
         regebp = __eh_find_caller(regebp,&retaddr);
         if (!regebp)
         {   // if end of call chain
-            debug(PRINTF) printf("end of call chain\n");
+            debug (trace) logTrace!"end of call chain";
             break;
         }
 
-        debug(PRINTF) printf("found caller, EBP = %p, retaddr = %p\n", regebp, retaddr);
+        debug (trace) logTrace!"found caller, EBP = %p, retaddr = %p"(regebp, retaddr);
 //if (++count == 12) *(char*)0=0;
         auto func_table = __eh_finddata(cast(void *)retaddr);   // find static data associated with function
         auto handler_table = func_table ? func_table.handlertable : null;
         if (!handler_table)         // if no static data
         {
-            debug(PRINTF) printf("no handler table\n");
+            debug (trace) logTrace!"no handler table";
             continue;
         }
         auto funcoffset = cast(size_t)func_table.fptr;
@@ -312,23 +313,23 @@ extern (C) void _d_throwc(Throwable h)
         auto spoff = handler_table.espoffset;
         auto retoffset = handler_table.retoffset;
 
-        debug(PRINTF)
+        debug (trace)
         {
-            printf("retaddr = %p\n", retaddr);
-            printf("regebp=%p, funcoffset=%p, spoff=x%x, retoffset=x%x\n",
-            regebp,funcoffset,spoff,retoffset);
+            logTrace!"retaddr = %p"(retaddr);
+            logTrace!"regebp=%p, funcoffset=%p, spoff=x%x, retoffset=x%x"(
+                regebp, funcoffset, spoff, retoffset);
         }
 
         // Find start index for retaddr in static data
         auto dim = handler_table.nhandlers;
 
-        debug(PRINTF)
+        debug (trace)
         {
-            printf("handler_info[%d]:\n", dim);
+            logTrace!"handler_info[%d]:"(dim);
             for (uint i = 0; i < dim; i++)
             {
                 auto phi = &handler_table.handler_info.ptr[i];
-                printf("\t[%d]: offset = x%04x, endoffset = x%04x, prev_index = %d, cioffset = x%04x, finally_offset = %x\n",
+                logTrace!"\t[%d]: offset = x%04x, endoffset = x%04x, prev_index = %d, cioffset = x%04x, finally_offset = %x"(
                         i, phi.offset, phi.endoffset, phi.prev_index, phi.cioffset, phi.finally_offset);
             }
         }
@@ -338,17 +339,17 @@ extern (C) void _d_throwc(Throwable h)
         {
             auto phi = &handler_table.handler_info.ptr[i];
 
-            debug(PRINTF) printf("i = %d, phi.offset = %04x\n", i, funcoffset + phi.offset);
+            debug (trace) logTrace!"i = %d, phi.offset = %04x"(i, funcoffset + phi.offset);
             if (retaddr > funcoffset + phi.offset &&
                 retaddr <= funcoffset + phi.endoffset)
                 index = i;
         }
-        debug(PRINTF) printf("index = %d\n", index);
+        debug (trace) logTrace!"index = %d"(index);
 
         if (dim)
         {
             auto phi = &handler_table.handler_info.ptr[index+1];
-            debug(PRINTF) printf("next finally_offset %p\n", phi.finally_offset);
+            debug (trace) logTrace!"next finally_offset %p"(phi.finally_offset);
             auto prev = cast(InFlight*) &__inflight;
             auto curr = prev.next;
 
@@ -357,7 +358,7 @@ extern (C) void _d_throwc(Throwable h)
                 auto e = cast(Error)(cast(Throwable) h);
                 if (e !is null && (cast(Error) curr.t) is null)
                 {
-                    debug(PRINTF) printf("new error %p bypassing inflight %p\n", h, curr.t);
+                    debug (trace) logTrace!"new error %p bypassing inflight %p"(h, curr.t);
 
                     e.bypassedException = curr.t;
                     prev.next = curr.next;
@@ -365,7 +366,7 @@ extern (C) void _d_throwc(Throwable h)
                 }
                 else
                 {
-                    debug(PRINTF) printf("replacing thrown %p with inflight %p\n", h, __inflight.t);
+                    debug (trace) logTrace!"replacing thrown %p with inflight %p"(h, __inflight.t);
 
                     h = Throwable.chainTogether(curr.t, cast(Throwable) h);
                     prev.next = curr.next;
@@ -438,7 +439,7 @@ extern (C) void _d_throwc(Throwable h)
                 // Call finally block
                 // Note that it is unnecessary to adjust the ESP, as the finally block
                 // accesses all items on the stack as relative to EBP.
-                debug(PRINTF) printf("calling finally_offset %p\n", phi.finally_offset);
+                debug (trace) logTrace!"calling finally_offset %p"(phi.finally_offset);
 
                 auto     blockaddr = cast(void*)(funcoffset + phi.finally_offset);
                 InFlight inflight;

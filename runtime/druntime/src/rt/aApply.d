@@ -8,7 +8,11 @@
  */
 module rt.aApply;
 
+debug (rt_aApply_trace) debug = trace;
+
 import core.internal.utf : decode, toUTF8;
+
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 /**********************************************/
 /* 1 argument versions */
@@ -76,7 +80,7 @@ extern (C) int _aApplycd1(scope const(char)[] aa, dg_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplycd1(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplycd1(), len = %d"(len);
     for (size_t i = 0; i < len; )
     {
         dchar d = aa[i];
@@ -93,7 +97,7 @@ extern (C) int _aApplycd1(scope const(char)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplycd1.unittest\n");
+    debug (trace) logTrace!"_aApplycd1.unittest";
 
     auto s = "hello"c[];
     int i;
@@ -117,7 +121,7 @@ unittest
     i = 0;
     foreach (dchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'a'); break;
@@ -137,7 +141,7 @@ extern (C) int _aApplywd1(scope const(wchar)[] aa, dg_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplywd1(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplywd1(), len = %d"(len);
     for (size_t i = 0; i < len; )
     {
         dchar d = aa[i];
@@ -154,7 +158,7 @@ extern (C) int _aApplywd1(scope const(wchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplywd1.unittest\n");
+    debug (trace) logTrace!"_aApplywd1.unittest";
 
     auto s = "hello"w[];
     int i;
@@ -178,7 +182,7 @@ unittest
     i = 0;
     foreach (dchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'a'); break;
@@ -198,7 +202,7 @@ extern (C) int _aApplycw1(scope const(char)[] aa, dg_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplycw1(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplycw1(), len = %d"(len);
     for (size_t i = 0; i < len; )
     {
         wchar w = aa[i];
@@ -227,7 +231,7 @@ extern (C) int _aApplycw1(scope const(char)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplycw1.unittest\n");
+    debug (trace) logTrace!"_aApplycw1.unittest";
 
     auto s = "hello"c[];
     int i;
@@ -251,7 +255,7 @@ unittest
     i = 0;
     foreach (wchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'a'); break;
@@ -272,7 +276,7 @@ extern (C) int _aApplywc1(scope const(wchar)[] aa, dg_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplywc1(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplywc1(), len = %d"(len);
     for (size_t i = 0; i < len; )
     {
         wchar w = aa[i];
@@ -303,7 +307,7 @@ extern (C) int _aApplywc1(scope const(wchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplywc1.unittest\n");
+    debug (trace) logTrace!"_aApplywc1.unittest";
 
     auto s = "hello"w[];
     int i;
@@ -327,7 +331,7 @@ unittest
     i = 0;
     foreach (char d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'a'); break;
@@ -351,7 +355,7 @@ extern (C) int _aApplydc1(scope const(dchar)[] aa, dg_t dg)
 {
     int result;
 
-    debug(apply) printf("_aApplydc1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplydc1(), len = %d"(aa.length);
     foreach (dchar d; aa)
     {
         if (d & ~0x7F)
@@ -379,7 +383,7 @@ extern (C) int _aApplydc1(scope const(dchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplyRdc1.unittest\n");
+    debug (trace) logTrace!"_aApplyRdc1.unittest";
 
     auto s = "hello"d[];
     int i;
@@ -403,7 +407,7 @@ unittest
     i = 0;
     foreach (char d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'a'); break;
@@ -427,7 +431,7 @@ extern (C) int _aApplydw1(scope const(dchar)[] aa, dg_t dg)
 {
     int result;
 
-    debug(apply) printf("_aApplydw1(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplydw1(), len = %d"(aa.length);
     foreach (dchar d; aa)
     {
         wchar w;
@@ -451,7 +455,7 @@ extern (C) int _aApplydw1(scope const(dchar)[] aa, dg_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplydw1.unittest\n");
+    debug (trace) logTrace!"_aApplydw1.unittest";
 
     auto s = "hello"d[];
     int i;
@@ -475,7 +479,7 @@ unittest
     i = 0;
     foreach (wchar d; s)
     {
-        //printf("i = %d, d = %x\n", i, d);
+        //debug (trace) logTrace!"i = %d, d = %x"(i, d);
         switch (i)
         {
             case 0:     assert(d == 'a'); break;
@@ -513,7 +517,7 @@ extern (C) int _aApplycd2(scope const(char)[] aa, dg2_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplycd2(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplycd2(), len = %d"(len);
     size_t n;
     for (size_t i = 0; i < len; i += n)
     {
@@ -535,14 +539,14 @@ extern (C) int _aApplycd2(scope const(char)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplycd2.unittest\n");
+    debug (trace) logTrace!"_aApplycd2.unittest";
 
     auto s = "hello"c[];
     int i;
 
     foreach (k, dchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == i);
         switch (i)
         {
@@ -561,7 +565,7 @@ unittest
     i = 0;
     foreach (k, dchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(d == 'a'); assert(k == 0); break;
@@ -581,7 +585,7 @@ extern (C) int _aApplywd2(scope const(wchar)[] aa, dg2_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplywd2(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplywd2(), len = %d"(len);
     size_t n;
     for (size_t i = 0; i < len; i += n)
     {
@@ -603,14 +607,14 @@ extern (C) int _aApplywd2(scope const(wchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplywd2.unittest\n");
+    debug (trace) logTrace!"_aApplywd2.unittest";
 
     auto s = "hello"w[];
     int i;
 
     foreach (k, dchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == i);
         switch (i)
         {
@@ -629,7 +633,7 @@ unittest
     i = 0;
     foreach (k, dchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 0); assert(d == 'a'); break;
@@ -649,7 +653,7 @@ extern (C) int _aApplycw2(scope const(char)[] aa, dg2_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplycw2(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplycw2(), len = %d"(len);
     size_t n;
     for (size_t i = 0; i < len; i += n)
     {
@@ -681,14 +685,14 @@ extern (C) int _aApplycw2(scope const(char)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplycw2.unittest\n");
+    debug (trace) logTrace!"_aApplycw2.unittest";
 
     auto s = "hello"c[];
     int i;
 
     foreach (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == i);
         switch (i)
         {
@@ -707,7 +711,7 @@ unittest
     i = 0;
     foreach (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 0); assert(d == 'a'); break;
@@ -728,7 +732,7 @@ extern (C) int _aApplywc2(scope const(wchar)[] aa, dg2_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplywc2(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplywc2(), len = %d"(len);
     size_t n;
     for (size_t i = 0; i < len; i += n)
     {
@@ -762,14 +766,14 @@ extern (C) int _aApplywc2(scope const(wchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplywc2.unittest\n");
+    debug (trace) logTrace!"_aApplywc2.unittest";
 
     auto s = "hello"w[];
     int i;
 
     foreach (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == i);
         switch (i)
         {
@@ -788,7 +792,7 @@ unittest
     i = 0;
     foreach (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 0); assert(d == 'a'); break;
@@ -813,7 +817,7 @@ extern (C) int _aApplydc2(scope const(dchar)[] aa, dg2_t dg)
     int result;
     size_t len = aa.length;
 
-    debug(apply) printf("_aApplydc2(), len = %d\n", len);
+    debug (trace) logTrace!"_aApplydc2(), len = %d"(len);
     for (size_t i = 0; i < len; i++)
     {
         dchar d = aa[i];
@@ -842,14 +846,14 @@ extern (C) int _aApplydc2(scope const(dchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplydc2.unittest\n");
+    debug (trace) logTrace!"_aApplydc2.unittest";
 
     auto s = "hello"d[];
     int i;
 
     foreach (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == i);
         switch (i)
         {
@@ -868,7 +872,7 @@ unittest
     i = 0;
     foreach (k, char d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 0); assert(d == 'a'); break;
@@ -891,7 +895,7 @@ unittest
 extern (C) int _aApplydw2(scope const(dchar)[] aa, dg2_t dg)
 {   int result;
 
-    debug(apply) printf("_aApplydw2(), len = %d\n", aa.length);
+    debug (trace) logTrace!"_aApplydw2(), len = %d"(aa.length);
     foreach (size_t i, dchar d; aa)
     {
         wchar w;
@@ -916,14 +920,14 @@ extern (C) int _aApplydw2(scope const(dchar)[] aa, dg2_t dg)
 
 unittest
 {
-    debug(apply) printf("_aApplydw2.unittest\n");
+    debug (trace) logTrace!"_aApplydw2.unittest";
 
     auto s = "hello"d[];
     int i;
 
     foreach (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         assert(k == i);
         switch (i)
         {
@@ -942,7 +946,7 @@ unittest
     i = 0;
     foreach (k, wchar d; s)
     {
-        //printf("i = %d, k = %d, d = %x\n", i, k, d);
+        //debug (trace) logTrace!"i = %d, k = %d, d = %x"(i, k, d);
         switch (i)
         {
             case 0:     assert(k == 0); assert(d == 'a'); break;

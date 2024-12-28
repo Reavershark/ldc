@@ -1,6 +1,10 @@
 module core.lifetime;
 
+debug (core_lifetime_trace) debug = trace;
+
 import core.internal.attributes : betterC;
+
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
 
 // emplace
 /**
@@ -2344,19 +2348,12 @@ pure nothrow @nogc @system unittest
     f(move(ncarray));
 }
 
-//debug = PRINTF;
-
-debug(PRINTF)
-{
-    import core.stdc.stdio;
-}
-
 /// Implementation of `_d_delstruct` and `_d_delstructTrace`
 template _d_delstructImpl(T)
 {
     private void _d_delstructImpure(ref T p)
     {
-        debug(PRINTF) printf("_d_delstruct(%p)\n", p);
+        debug (trace) logTrace!"_d_delstruct(%p)"(p);
 
         import core.memory : GC;
 
@@ -2669,7 +2666,7 @@ if (!Init.length ||
 T _d_newThrowable(T)() @trusted
     if (is(T : Throwable) && __traits(getLinkage, T) == "D")
 {
-    debug(PRINTF) printf("_d_newThrowable(%s)\n", cast(char*) T.stringof);
+    debug (trace) logTrace!"_d_newThrowable(%s)"(cast(char*) T.stringof);
 
     import core.memory : pureMalloc;
     auto init = __traits(initSymbol, T);
@@ -2680,7 +2677,7 @@ T _d_newThrowable(T)() @trusted
         onOutOfMemoryError();
     }
 
-    debug(PRINTF) printf(" p = %p\n", p);
+    debug (trace) logTrace!" p = %p"(p);
 
     // initialize it
     p[0 .. init.length] = cast(void[]) init[];
@@ -2693,7 +2690,7 @@ T _d_newThrowable(T)() @trusted
         GC.addRange(p, init.length);
     }
 
-    debug(PRINTF) printf("initialization done\n");
+    debug (trace) logTrace!"initialization done";
 
     (cast(Throwable) p).refcount() = 1;
 
@@ -2761,27 +2758,27 @@ if (is(T == class))
             attr |= BlkAttr.NO_SCAN;
 
         p = GC.malloc(init.length, attr, typeid(T));
-        debug(PRINTF) printf(" p = %p\n", p);
+        debug (trace) logTrace!" p = %p"(p);
     }
 
-    debug(PRINTF)
+    debug (trace)
     {
-        printf("p = %p\n", p);
-        printf("init.ptr = %p, len = %llu\n", init.ptr, cast(ulong)init.length);
-        printf("vptr = %p\n", *cast(void**) init);
-        printf("vtbl[0] = %p\n", (*cast(void***) init)[0]);
-        printf("vtbl[1] = %p\n", (*cast(void***) init)[1]);
-        printf("init[0] = %x\n", (cast(uint*) init)[0]);
-        printf("init[1] = %x\n", (cast(uint*) init)[1]);
-        printf("init[2] = %x\n", (cast(uint*) init)[2]);
-        printf("init[3] = %x\n", (cast(uint*) init)[3]);
-        printf("init[4] = %x\n", (cast(uint*) init)[4]);
+        logTrace!"p = %p"(p);
+        logTrace!"init.ptr = %p, len = %llu"(init.ptr, cast(ulong)init.length);
+        logTrace!"vptr = %p"(*cast(void**) init);
+        logTrace!"vtbl[0] = %p"((*cast(void***) init)[0]);
+        logTrace!"vtbl[1] = %p"((*cast(void***) init)[1]);
+        logTrace!"init[0] = %x"((cast(uint*) init)[0]);
+        logTrace!"init[1] = %x"((cast(uint*) init)[1]);
+        logTrace!"init[2] = %x"((cast(uint*) init)[2]);
+        logTrace!"init[3] = %x"((cast(uint*) init)[3]);
+        logTrace!"init[4] = %x"((cast(uint*) init)[4]);
     }
 
     // initialize it
     p[0 .. init.length] = cast(void[]) init[];
 
-    debug(PRINTF) printf("initialization done\n");
+    debug (trace) logTrace!"initialization done";
     return cast(T) p;
 }
 

@@ -12,9 +12,14 @@
 
 module rt.minfo;
 
+debug (rt_minfo_logModuleDependencies) debug = logModuleDependencies;
+
 import core.stdc.stdlib;  // alloca
 import core.stdc.string;  // memcpy
 import rt.sections;
+
+debug (logModuleDependencies)
+    private alias logModuleDependencies = imported!"core.internal.util.log".log!"moduleDependencies";
 
 enum
 {
@@ -200,17 +205,18 @@ struct ModuleGroup
             assert(0, "DRT invalid cycle handling option: " ~ cycleHandling);
         }
 
-        debug (printModuleDependencies)
+        debug (logModuleDependencies)
         {
-            import core.stdc.stdio : printf;
-
             foreach (_m; _modules)
             {
-                printf("%s%s%s:", _m.name.ptr, (_m.flags & MIstandalone)
-                        ? "+".ptr : "".ptr, (_m.flags & (MIctor | MIdtor)) ? "*".ptr : "".ptr);
+                logModuleDependencies!"%s%s%s:"(
+                    _m.name.ptr,
+                    (_m.flags & MIstandalone) ? "+".ptr : "".ptr,
+                    (_m.flags & (MIctor | MIdtor)) ? "*".ptr : "".ptr,
+                );
+                // log TODO: append to previous log by building string
                 foreach (_i; _m.importedModules)
-                    printf(" %s", _i.name.ptr);
-                printf("\n");
+                    logModuleDependencies!" %s"(_i.name.ptr);
             }
         }
 

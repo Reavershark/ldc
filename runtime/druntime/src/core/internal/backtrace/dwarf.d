@@ -51,8 +51,6 @@ module core.internal.backtrace.dwarf;
 
 version (Posix):
 
-import core.internal.string;
-
 version (OSX)
     version = Darwin;
 else version (iOS)
@@ -62,6 +60,10 @@ else version (TVOS)
 else version (WatchOS)
     version = Darwin;
 
+debug (core_internal_backtrace_dwarf_info) debug = info;
+
+import core.internal.string;
+
 version (Darwin)
     import core.internal.backtrace.macho;
 else
@@ -70,8 +72,7 @@ else
 import core.internal.container.array;
 import core.stdc.string : strlen, memcpy;
 
-//debug = DwarfDebugMachine;
-debug(DwarfDebugMachine) import core.stdc.stdio : printf;
+debug (info) private alias logInfo = imported!"core.internal.util.log".log!"info";
 
 struct Location
 {
@@ -422,20 +423,18 @@ version (Darwin) {
  */
 void resolveAddresses(const(ubyte)[] debugLineSectionData, Location[] locations, size_t baseAddress) @nogc nothrow
 {
-    debug(DwarfDebugMachine) import core.stdc.stdio;
-
     size_t numberOfLocationsFound = 0;
 
     const(ubyte)[] dbg = debugLineSectionData;
     while (dbg.length > 0)
     {
-        debug(DwarfDebugMachine) printf("new debug program\n");
+        debug (info) logInfo!"new debug program";
         const lp = readLineNumberProgram(dbg);
 
         LocationInfo lastLoc = LocationInfo(-1, -1);
         const(void)* lastAddress;
 
-        debug(DwarfDebugMachine) printf("program:\n");
+        debug (info) logInfo!"program:";
         runStateMachine(lp,
             (const(void)* address, LocationInfo locInfo, bool isEndSequence)
             {
@@ -580,7 +579,7 @@ bool runStateMachine(ref const(LineNumberProgram) lp, scope RunStateMachineCallb
                     {
                         case endSequence:
                             machine.isEndSequence = true;
-                            debug(DwarfDebugMachine) printf("endSequence %p\n", machine.address);
+                            debug (info) logInfo!"endSequence %p"(machine.address);
                             if (!callback(machine.address, LocationInfo(machine.fileIndex, machine.line), true)) return true;
                             machine = StateMachine.init;
                             machine.isStatement = lp.defaultIsStatement;
@@ -588,25 +587,25 @@ bool runStateMachine(ref const(LineNumberProgram) lp, scope RunStateMachineCallb
 
                         case setAddress:
                             const address = program.read!(void*)();
-                            debug(DwarfDebugMachine) printf("setAddress %p\n", address);
+                            debug (info) logInfo!"setAddress %p"(address);
                             machine.address = address;
                             machine.operationIndex = 0;
                             break;
 
                         case defineFile: // TODO: add proper implementation
-                            debug(DwarfDebugMachine) printf("defineFile\n");
+                            debug (info) logInfo!"defineFile";
                             program = program[len - 1 .. $];
                             break;
 
                         case setDiscriminator:
                             const discriminator = cast(uint) program.readULEB128();
-                            debug(DwarfDebugMachine) printf("setDiscriminator %d\n", discriminator);
+                            debug (info) logInfo!"setDiscriminator %d"(discriminator);
                             machine.discriminator = discriminator;
                             break;
 
                         default:
                             // unknown opcode
-                            debug(DwarfDebugMachine) printf("unknown extended opcode %d\n", cast(int) eopcode);
+                            debug (info) logInfo!"unknown extended opcode %d"(cast(int) eopcode);
                             program = program[len - 1 .. $];
                             break;
                     }
@@ -614,7 +613,7 @@ bool runStateMachine(ref const(LineNumberProgram) lp, scope RunStateMachineCallb
                     break;
 
                 case copy:
-                    debug(DwarfDebugMachine) printf("copy %p\n", machine.address);
+                    debug (info) logInfo!"copy %p"(machine.address);
                     if (!callback(machine.address, LocationInfo(machine.fileIndex, machine.line), false)) return true;
                     machine.isBasicBlock = false;
                     machine.isPrologueEnd = false;
@@ -625,67 +624,67 @@ bool runStateMachine(ref const(LineNumberProgram) lp, scope RunStateMachineCallb
                 case advancePC:
                     const operationAdvance = cast(size_t) readULEB128(program);
                     advanceAddressAndOpIndex(operationAdvance);
-                    debug(DwarfDebugMachine) printf("advancePC %d to %p\n", cast(int) operationAdvance, machine.address);
+                    debug (info) logInfo!"advancePC %d to %p"(cast(int) operationAdvance, machine.address);
                     break;
 
                 case advanceLine:
                     long ad = readSLEB128(program);
                     machine.line += ad;
-                    debug(DwarfDebugMachine) printf("advanceLine %d to %d\n", cast(int) ad, cast(int) machine.line);
+                    debug (info) logInfo!"advanceLine %d to %d"(cast(int) ad, cast(int) machine.line);
                     break;
 
                 case setFile:
                     uint index = cast(uint) readULEB128(program);
-                    debug(DwarfDebugMachine) printf("setFile to %d\n", cast(int) index);
+                    debug (info) logInfo!"setFile to %d"(cast(int) index);
                     machine.fileIndex = index;
                     break;
 
                 case setColumn:
                     uint col = cast(uint) readULEB128(program);
-                    debug(DwarfDebugMachine) printf("setColumn %d\n", cast(int) col);
+                    debug (info) logInfo!"setColumn %d"(cast(int) col);
                     machine.column = col;
                     break;
 
                 case negateStatement:
-                    debug(DwarfDebugMachine) printf("negateStatement\n");
+                    debug (info) logInfo!"negateStatement";
                     machine.isStatement = !machine.isStatement;
                     break;
 
                 case setBasicBlock:
-                    debug(DwarfDebugMachine) printf("setBasicBlock\n");
+                    debug (info) logInfo!"setBasicBlock";
                     machine.isBasicBlock = true;
                     break;
 
                 case constAddPC:
                     const operationAdvance = (255 - lp.opcodeBase) / lp.lineRange;
                     advanceAddressAndOpIndex(operationAdvance);
-                    debug(DwarfDebugMachine) printf("constAddPC %p\n", machine.address);
+                    debug (info) logInfo!"constAddPC %p"(machine.address);
                     break;
 
                 case fixedAdvancePC:
                     const add = program.read!ushort();
                     machine.address += add;
                     machine.operationIndex = 0;
-                    debug(DwarfDebugMachine) printf("fixedAdvancePC %d to %p\n", cast(int) add, machine.address);
+                    debug (info) logInfo!"fixedAdvancePC %d to %p"(cast(int) add, machine.address);
                     break;
 
                 case setPrologueEnd:
                     machine.isPrologueEnd = true;
-                    debug(DwarfDebugMachine) printf("setPrologueEnd\n");
+                    debug (info) logInfo!"setPrologueEnd";
                     break;
 
                 case setEpilogueBegin:
                     machine.isEpilogueBegin = true;
-                    debug(DwarfDebugMachine) printf("setEpilogueBegin\n");
+                    debug (info) logInfo!"setEpilogueBegin";
                     break;
 
                 case setISA:
                     machine.isa = cast(uint) readULEB128(program);
-                    debug(DwarfDebugMachine) printf("setISA %d\n", cast(int) machine.isa);
+                    debug (info) logInfo!"setISA %d"(cast(int) machine.isa);
                     break;
 
                 default:
-                    debug(DwarfDebugMachine) printf("unknown opcode %d\n", cast(int) opcode);
+                    debug (info) logInfo!"unknown opcode %d"(cast(int) opcode);
                     return false;
             }
         }
@@ -697,9 +696,8 @@ bool runStateMachine(ref const(LineNumberProgram) lp, scope RunStateMachineCallb
             const lineIncrement = lp.lineBase + (opcode % lp.lineRange);
             machine.line += lineIncrement;
 
-            debug (DwarfDebugMachine)
-                printf("special %d %d to %p line %d\n", cast(int) addressIncrement,
-                       cast(int) lineIncrement, machine.address, machine.line);
+            debug (info) logInfo!"special %d %d to %p line %d"(
+                cast(int) addressIncrement, cast(int) lineIncrement, machine.address, machine.line);
 
             if (!callback(machine.address, LocationInfo(machine.fileIndex, machine.line), false)) return true;
 
@@ -866,11 +864,11 @@ Array!EntryFormatPair readEntryFormat(ref const(ubyte)[] buffer) @nogc nothrow
         pair.form = cast(DW_FORM) buffer.readULEB128();
     }
 
-    debug (DwarfDebugMachine)
+    debug (info)
     {
-        printf("entryFormat: (%d)\n", cast(int) pairs.length);
+        logInfo!"entryFormat: (%d)"(cast(int) pairs.length);
         foreach (ref pair; pairs)
-            printf("\t- type: %d, form: %d\n", cast(int) pair.type, cast(int) pair.form);
+            logInfo!"\t- type: %d, form: %d"(cast(int) pair.type, cast(int) pair.form);
     }
 
     return pairs;
@@ -1118,26 +1116,26 @@ LineNumberProgram readLineNumberProgram(ref const(ubyte)[] data) @nogc nothrow
         lp.sourceFiles = readSequence!readFileNameEntry(data);
     }
 
-    debug (DwarfDebugMachine)
+    debug (info)
     {
-        printf("include_directories: (%d)\n", cast(int) lp.includeDirectories.length);
+        logInfo!"include_directories: (%d)"(cast(int) lp.includeDirectories.length);
         foreach (dir; lp.includeDirectories)
-            printf("\t- %.*s\n", cast(int) dir.length, dir.ptr);
-        printf("source_files: (%d)\n", cast(int) lp.sourceFiles.length);
+            logInfo!"\t- %.*s"(cast(int) dir.length, dir.ptr);
+        logInfo!"source_files: (%d)"(cast(int) lp.sourceFiles.length);
         foreach (ref sf; lp.sourceFiles)
         {
             if (sf.dirIndex > lp.includeDirectories.length)
-                printf("\t- Out of bound directory! (%llu): %.*s\n",
+                logInfo!"\t- Out of bound directory! (%llu): %.*s"(
                        sf.dirIndex, cast(int) sf.file.length, sf.file.ptr);
             else if (sf.dirIndex > 0)
             {
                 const dir = lp.includeDirectories[sf.dirIndex - 1];
-                printf("\t- (Dir:%llu:%.*s/)%.*s\n", sf.dirIndex,
+                logInfo!"\t- (Dir:%llu:%.*s/)%.*s"(sf.dirIndex,
                        cast(int) dir.length, dir.ptr,
                        cast(int) sf.file.length, sf.file.ptr);
             }
             else
-                printf("\t- %.*s\n", cast(int) sf.file.length, sf.file.ptr);
+                logInfo!"\t- %.*s"(cast(int) sf.file.length, sf.file.ptr);
         }
     }
 

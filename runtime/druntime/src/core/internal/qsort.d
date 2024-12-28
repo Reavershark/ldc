@@ -8,10 +8,6 @@
  */
 module core.internal.qsort;
 
-//debug=qsort;
-
-import core.stdc.stdlib;
-
 version (OSX)
     version = Darwin;
 else version (iOS)
@@ -20,6 +16,12 @@ else version (TVOS)
     version = Darwin;
 else version (WatchOS)
     version = Darwin;
+
+version (unittest) debug (core_internal_qsort_logUnittest) debug = logUnittest;
+
+import core.stdc.stdlib;
+
+version (unittest) debug (logUnittest) private alias logUnittest = imported!"core.internal.util.log".log!"unittest";
 
 // qsort_r was added in glibc in 2.8. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=88127
 version (CRuntime_Glibc)
@@ -164,8 +166,7 @@ else
 
 unittest
 {
-    debug(qsort) import core.stdc.stdio;
-    debug(qsort) printf("array.sort.unittest()\n");
+    debug (logUnittest) logUnittest!"array.sort.unittest()";
 
     int[] a = new int[10];
 
@@ -184,15 +185,14 @@ unittest
 
     for (int i = 0; i < a.length - 1; i++)
     {
-        debug(qsort) printf("i = %d", i);
-        debug(qsort) printf(" %d %d\n", a[i], a[i + 1]);
+        debug (logUnittest) logUnittest!"i = %d %d %d"(i, a[i], a[i + 1]);
         assert(a[i] <= a[i + 1]);
     }
 }
 
 unittest
 {
-    debug(qsort) printf("struct.sort.unittest()\n");
+    debug (logUnittest) logUnittest!"struct.sort.unittest()";
 
     static struct TestStruct
     {
@@ -222,8 +222,7 @@ unittest
 
     for (int i = 0; i < a.length - 1; i++)
     {
-        //printf("i = %d", i);
-        //printf(" %d %d\n", a[i], a[i + 1]);
+        debug (logUnittest) logUnittest!"i = %d %d %d"(i, a[i], a[i + 1]);
         assert(a[i] <= a[i + 1]);
     }
 }

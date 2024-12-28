@@ -14,6 +14,10 @@
  */
 module rt.cast_;
 
+debug (rt_cast) debug = trace;
+
+debug (trace) private alias logTrace = imported!"core.internal.util.log".log!"trace";
+
 extern (C):
 @nogc:
 nothrow:
@@ -60,7 +64,7 @@ Object _d_toObject(return scope void* p)
      */
     if (pi.offset < 0x10000)
     {
-        debug(cast_) printf("\tpi.offset = %d\n", pi.offset);
+        debug (trace) logTrace!"\tpi.offset = %d"(pi.offset);
         return cast(Object)(p - pi.offset);
     }
     return o;
@@ -72,22 +76,22 @@ Object _d_toObject(return scope void* p)
  */
 void* _d_interface_cast(void* p, ClassInfo c)
 {
-    debug(cast_) printf("_d_interface_cast(p = %p, c = '%.*s')\n", p, c.name);
+    debug (trace) logTrace!"_d_interface_cast(p = %p, c = '%.*s')"(p, c.name);
     if (!p)
         return null;
 
     Interface* pi = **cast(Interface***) p;
 
-    debug(cast_) printf("\tpi.offset = %d\n", pi.offset);
+    debug (trace) logTrace!"\tpi.offset = %d"(pi.offset);
     Object o2 = cast(Object)(p - pi.offset);
     void* res = null;
     size_t offset = 0;
     if (o2 && _d_isbaseof2(typeid(o2), c, offset))
     {
-        debug(cast_) printf("\toffset = %d\n", offset);
+        debug (trace) logTrace!"\toffset = %d"(offset);
         res = cast(void*) o2 + offset;
     }
-    debug(cast_) printf("\tresult = %p\n", res);
+    debug (trace) logTrace!"\tresult = %p"(res);
     return res;
 }
 
@@ -101,16 +105,16 @@ void* _d_interface_cast(void* p, ClassInfo c)
  */
 void* _d_dynamic_cast(Object o, ClassInfo c)
 {
-    debug(cast_) printf("_d_dynamic_cast(o = %p, c = '%.*s')\n", o, c.name);
+    debug (trace) logTrace!"_d_dynamic_cast(o = %p, c = '%.*s')"(o, c.name);
 
     void* res = null;
     size_t offset = 0;
     if (o && _d_isbaseof2(typeid(o), c, offset))
     {
-        debug(cast_) printf("\toffset = %d\n", offset);
+        debug (trace) logTrace!"\toffset = %d"(offset);
         res = cast(void*) o + offset;
     }
-    debug(cast_) printf("\tresult = %p\n", res);
+    debug (trace) logTrace!"\tresult = %p"(res);
     return res;
 }
 
@@ -124,7 +128,7 @@ void* _d_dynamic_cast(Object o, ClassInfo c)
  */
 void* _d_class_cast(Object o, ClassInfo c)
 {
-    debug(cast_) printf("_d_cast_cast(o = %p, c = '%.*s', level %d)\n", o, c.name, level);
+    debug (trace) logTrace!"_d_cast_cast(o = %p, c = '%.*s', level %d)"(o, c.name, level);
 
     if (!o)
         return null;
